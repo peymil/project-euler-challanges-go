@@ -26,7 +26,7 @@ func main() {
 
 	readFile.Close()
 
-	var arrays [][]int
+	var grid [][]int
 	for _, eachline := range fileTextLines {
 		strNums := strings.Split(eachline, " ")
 		var intNums []int
@@ -34,21 +34,23 @@ func main() {
 			num, _ := strconv.Atoi(strNum)
 			intNums = append(intNums, num)
 		}
-		arrays = append(arrays, intNums)
+		grid = append(grid, intNums)
 	}
-	fmt.Printf("%d\n", findAdjLines(arrays, 4))
+	fmt.Printf("%d\n", findAdjLines(grid, 4))
 
 }
-func findAdjLines(arrays [][]int, n int) int {
-	subArrayLength := len(arrays[0])
-	ArrayLength := len(arrays)
+func findAdjLines(grid [][]int, n int) int {
+	subArrayLength := len(grid[0])
+	ArrayLength := len(grid)
 	var maxSum int = 0
-	for arrayN := range arrays {
+
+	for arrayN := range grid {
 		for subArrayN := 0; subArrayN < subArrayLength; subArrayN++ {
 
 			if subArrayN < subArrayLength-n+1 {
-				horizontalAdjLineSum := findMultiplationOfArray(findHorizontallyAdjLine(arrays, subArrayN, arrayN, n))
-				fmt.Printf("%d\n", horizontalAdjLineSum)
+				horizontalAdjLineArr := findHorizontallyAdjLine(grid, subArrayN, arrayN, n)
+				horizontalAdjLineSum := findMultiplationOfArray(horizontalAdjLineArr)
+				fmt.Printf("horizontalAdjLineArr:%v\n", horizontalAdjLineArr)
 
 				if horizontalAdjLineSum > maxSum {
 					maxSum = horizontalAdjLineSum
@@ -56,30 +58,51 @@ func findAdjLines(arrays [][]int, n int) int {
 				}
 			}
 			if arrayN < ArrayLength-n+1 {
-				verticalAdjLineSum := findMultiplationOfArray(findVerticallyAdjLine(arrays, subArrayN, arrayN, n))
-				fmt.Printf("%d\n", verticalAdjLineSum)
+				verticalAdjLineArr := findVerticallyAdjLine(grid, subArrayN, arrayN, n)
+				verticalAdjLineSum := findMultiplationOfArray(verticalAdjLineArr)
+				fmt.Printf("verticalAdjLineArr:%v\n", verticalAdjLineArr)
 
 				if verticalAdjLineSum > maxSum {
 					maxSum = verticalAdjLineSum
 				}
 			}
 			if arrayN < ArrayLength-n+1 && subArrayN < subArrayLength-n+1 {
-				crossAdjLineSum := findMultiplationOfArray(findCrossLine(arrays, subArrayN, arrayN, n))
-				fmt.Printf("%d\n", crossAdjLineSum)
+				rightCrossAdjLineArr := findRightCrossLine(grid, subArrayN, arrayN, n)
+				crossAdjLineSum := findMultiplationOfArray(rightCrossAdjLineArr)
+				fmt.Printf("findRightCrossLine:%v\n", rightCrossAdjLineArr)
 
 				if crossAdjLineSum > maxSum {
 					maxSum = crossAdjLineSum
 				}
 			}
+			if subArrayN > n && arrayN < ArrayLength-n+1 {
+				leftCrossAdjLineArr := findLeftCrossLine(grid, subArrayN, arrayN, n)
+				leftCrossAdjLineSum := findMultiplationOfArray(leftCrossAdjLineArr)
+				fmt.Printf("findLeftCrossLine:%v\n", leftCrossAdjLineArr)
+
+				if leftCrossAdjLineSum > maxSum {
+					maxSum = leftCrossAdjLineSum
+				}
+			}
+			fmt.Printf("\n")
 
 		}
 	}
 	return maxSum
 }
-func findCrossLine(arrays [][]int, startX int, startY int, count int) []int {
+func findRightCrossLine(arrays [][]int, startX int, startY int, count int) []int {
 	var crossLine []int
 	for i := 0; i < count; i++ {
 		num := arrays[startY+i][startX+i]
+		crossLine = append(crossLine, num)
+	}
+	return crossLine
+
+}
+func findLeftCrossLine(arrays [][]int, startX int, startY int, count int) []int {
+	var crossLine []int
+	for i := 0; i < count; i++ {
+		num := arrays[startY+i][startX-i]
 		crossLine = append(crossLine, num)
 	}
 	return crossLine
@@ -107,10 +130,10 @@ func findHorizontallyAdjLine(arrays [][]int, startX int, startY int, count int) 
 
 }
 func findMultiplationOfArray(array []int) int {
-	var sum int = 1
-
+	sum := 1
 	for _, elem := range array {
 		sum *= elem
 	}
-	return sum
+	fmt.Printf("sum %d\n", sum)
+	return int(sum)
 }
